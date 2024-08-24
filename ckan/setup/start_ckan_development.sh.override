@@ -9,6 +9,7 @@ do
     if [ -d $i ];
     then
 
+	echo "Checking for requirements.txt files..."
         if [ -f $i/pip-requirements.txt ];
         then
             pip install -r $i/pip-requirements.txt
@@ -24,6 +25,13 @@ do
             pip install -r $i/dev-requirements.txt
             echo "Found dev-requirements file in $i"
         fi
+	# not working... why?
+	if [ -f $i/test-requirements.txt ];
+        then
+            pip install -r $i/test-requirements.txt
+            echo "Found test-requirements file in $i"
+        fi
+
         if [ -f $i/setup.py ];
         then
             cd $i
@@ -92,8 +100,17 @@ then
     done
 fi
 
+# secret key from env var for now...
+ckan config-tool $CKAN_INI "SECRET_KEY=$SECRET_KEY"
+
 # Start supervisord
 supervisord --configuration /etc/supervisord.conf &
 
 # Start the development server with automatic reload
-sudo -u ckan -EH ckan -c $CKAN_INI run -H 0.0.0.0
+if [ -n "$PDB" ] && [ "$PDB" != "0" ] && [ "$PDB" != "false" ]; then
+	echo "Starting with pdb"
+	sudo python -m pdb /usr/lib/ckan/venv/bin/ckan --config $CKAN_INI run --host 0.0.0.0 --passthrough-errors
+else
+	sudo -u ckan -EH ckan -c $CKAN_INI run -H 0.0.0.0
+fi
+
