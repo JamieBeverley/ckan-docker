@@ -32,7 +32,6 @@ services:
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
     # for debugger/pdb mode
-    # command: python -m pdb /usr/local/bin/ckan --config /srv/app/ckan.ini run --host 0.0.0.0 --passthrough-errors 
     stdin_open: true
     tty: true
 
