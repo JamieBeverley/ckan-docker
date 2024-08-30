@@ -1,3 +1,5 @@
+.venv
+ckan.ini
 # generic
 .DS_Store
 .vagrant
@@ -10,4 +12,3 @@ local/*
 .env
 src/
 *.swp
-
