@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 .venv
 ckan.ini
+=======
+*.swp
+src/ckanext-scheming
+>>>>>>> Stashed changes
 # generic
 .DS_Store
 .vagrant
