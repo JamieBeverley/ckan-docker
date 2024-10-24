@@ -7,6 +7,17 @@ volumes:
 
 services:
     
+  nginx:
+    build:
+      context: nginx/
+      dockerfile: Dockerfile
+    depends_on:
+      ckan:
+        condition: service_healthy
+    ports:
+      - "0.0.0.0:443:443"
+      - "0.0.0.0:80:80"
+
   datapusher:
     network_mode: host
     image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
