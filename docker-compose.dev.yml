@@ -21,6 +21,7 @@ services:
       - db
       - solr
       - redis
+      - pg_tileserv
     ports:
       - "0.0.0.0:${CKAN_PORT_HOST}:5000"
     volumes:
@@ -78,3 +79,15 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
+
+  pg_tileserv:
+    image: pramsey/pg_tileserv
+    container_name: pg_tileserv
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgres://${DATASTORE_READONLY_USER}:${DATASTORE_READONLY_PASSWORD}@db:5432/${DATASTORE_DB}"
+    ports:
+      # For debugging, remove eventually
+      - "7800:7800"
