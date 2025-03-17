@@ -394,7 +394,7 @@ Down:
 ```
 Up:
 ```sh
-./bin/compose up -d && ./bin/install_src && ./bin/compose restart ckan-dev && ./bin/logs -f
+./bin/compose up -d && ./bin/install_src && ./bin/compose restart ckan-dev && ./bin/logs
 ```
 
 Seed data
@@ -404,4 +404,9 @@ Seed data
 Then probably:
 ```
 ./bin/ckan views create
+```
+
+Then maybe:
+```
+docker attach $(docker container ls -qf name=ckan-dev)
 ```

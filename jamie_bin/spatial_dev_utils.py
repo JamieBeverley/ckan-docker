@@ -50,7 +50,8 @@ def create_package() -> None:
         "name": PACKAGE_NAME,
         "title": "Test Spatial Package",
         "private": False,
-        "owner_org": ORG_NAME
+        "owner_org": ORG_NAME,
+        "url": f"{CKAN_URL}/dataset/test-spatial-package",
     }
     ckan.action.package_create(**package)
     print(f"Created package: {PACKAGE_NAME}")
@@ -65,6 +66,7 @@ def create_spatial_resource(geometry_type: Literal["Point", "LineString", "Polyg
         package_id=PACKAGE_NAME,
         name=f"{geometry_type} Data",
         format="GeoJSON",
+        url=f"{CKAN_URL}/{PACKAGE_NAME}/{geometry_type}",
     )
     
     resource_id = resource["id"]
@@ -97,6 +99,7 @@ def create_non_spatial_resource(rows: int = 1000) -> None:
     resource = ckan.action.resource_create(
         package_id=PACKAGE_NAME,
         name="Non Spatial Data",
+        url=f"{CKAN_URL}/{PACKAGE_NAME}/non-spatial",
     )
     
     resource_id = resource["id"]

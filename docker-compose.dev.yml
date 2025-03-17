@@ -37,6 +37,9 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
+    # Debugging...
+    stdin_open: true
+    tty: true
 
   datapusher:
     image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
