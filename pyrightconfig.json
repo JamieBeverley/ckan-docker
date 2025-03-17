@@ -1,0 +1,9 @@
+{
+    "reportMissingTypeStubs": false,
+    "reportExplicitAny": false,
+    "reportUnknownMemberType": false,
+    "reportUnknownVariableType": false,
+    "reportUnknownArgumentType": false,
+    "reportUnusedCallResult": false,
+    "reportAny": false,
+}
