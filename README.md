@@ -363,3 +363,45 @@ It is open and licensed under the GNU Affero General Public License (AGPL) v3.0
 whose full text may be found at:
 
 http://www.fsf.org/licensing/licenses/agpl-3.0.html
+
+
+
+
+
+
+
+
+
+
+# Jamie Notes:
+- order of installing extensions is broken
+- `prerun.py` invokes `ckan` cli commands
+- those commands will fail if `ckan.ini` lists extensions that are not yet installed
+- for instance, those that are developed locally here (`src_extensions`)
+- tried to call `install_src.sh` before other prerun steps by modifying prerun.py
+- `install_src.sh` needs to be run as a root user
+- `sudo` not installed and `prerun.py` is run as `ckan` (I think doing otherwise would
+   break intended security of not having the container user be `root`)
+- So:
+    - compose up fails
+    - we have to call `install_src` while its failling
+    - we then have to compose restart ckan-dev
+
+## utils reference...
+Down:
+```sh
+./bin/compose down && ./jamie_bin/volume-purge && ./bin/compose build
+```
+Up:
+```sh
+./bin/compose up -d && ./bin/install_src && ./bin/compose restart ckan-dev && ./bin/logs -f
+```
+
+Seed data
+```
+./jamie_bin/seed-test-data
+```
+Then probably:
+```
+./bin/ckan views create
+```

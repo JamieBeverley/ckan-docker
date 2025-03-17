@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+ROOT="$(dirname ${BASH_SOURCE[0]})/.."
+PYTHON="$ROOT/jamie_bin/.venv/bin/python"
+
+source "$ROOT/jamie_bin/api-key.sh"
+
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-org
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-package
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-spatial-resource Point
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-non-spatial-resource
