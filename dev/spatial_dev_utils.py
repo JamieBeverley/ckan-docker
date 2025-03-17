@@ -209,6 +209,36 @@ def create_spatial_resource(geometry_type: str, rows: int = 1000) -> None:
     )
     print(f"Created spatial resource with {rows} rows of {geometry_type} data.")
 
+def create_non_spatial_resource(rows: int = 1000) -> None:
+    ckan = RemoteCKAN(CKAN_URL, apikey=API_KEY)
+    
+    resource = ckan.action.resource_create(
+        package_id=PACKAGE_NAME,
+        name=f"Non Spatial Data",
+    )
+    
+    resource_id = resource["id"]
+    fields = [
+        {"id": "when", "type": "timestamp"},
+        {"id": "value", "type": "float"},
+    ]
+    
+    data = [
+        {
+            "when": (datetime.datetime.utcnow() - datetime.timedelta(days=random.randint(0, 365))).isoformat(),
+            "value": random.uniform(0, 100),
+        }
+        for _ in range(rows)
+    ]
+    
+    ckan.action.datastore_create(
+        resource_id=resource_id,
+        fields=fields,
+        records=data,
+        force=True
+    )
+    print(f"Created non-spatial resource with {rows} rows of data.")
+
 def purge() -> None:
     ckan = RemoteCKAN(CKAN_URL, apikey=API_KEY)
     try:
@@ -240,7 +270,11 @@ def main() -> None:
     spatial_parser = subparsers.add_parser("create-spatial-resource", help="Create a spatial datastore resource")
     spatial_parser.add_argument("geometry_type", choices=GEOMETRY_TYPES, help="Type of geospatial data")
     spatial_parser.add_argument("--rows", type=int, default=1000, help="Number of rows to generate")
-    
+
+
+    non_spatial_parser = subparsers.add_parser("create-non-spatial-resource", help="Create a tabular datastore resource")
+    non_spatial_parser.add_argument("--rows", type=int, default=1000, help="Number of rows to generate")
+
     subparsers.add_parser("purge", help="Hard-delete the package, resources, and organization")
     
     args = parser.parse_args()
@@ -251,6 +285,8 @@ def main() -> None:
         create_package()
     elif args.command == "create-spatial-resource":
         create_spatial_resource(args.geometry_type, args.rows)
+    elif args.command == "create-non-spatial-resource":
+        create_non_spatial_resource(args.rows)
     elif args.command == "purge":
         purge()
 
