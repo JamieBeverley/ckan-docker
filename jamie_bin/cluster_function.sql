@@ -1,3 +1,5 @@
+
+
 CREATE OR REPLACE FUNCTION xyz_cluster(
     z INTEGER,
     x INTEGER,
@@ -6,7 +8,8 @@ CREATE OR REPLACE FUNCTION xyz_cluster(
 LANGUAGE SQL 
 AS $$
 WITH
-    tile_bounds AS (SELECT ST_Transform(ST_TileEnvelope(z, x, y),4326) AS geom),
+    tile_bounds AS (SELECT ST_Transform(ST_TileEnvelope(z, x, y), 4326) AS geom),
+    -- geoms AS
     groups AS (
         SELECT 
         -- "geometry", "when", "value",
@@ -16,7 +19,9 @@ WITH
             -- "value",
             ST_ClusterDBSCAN(
                 "geometry", -- @id. Array of points ordered by id
-                0.011,  -- @distance: Hardcoded cluster distance in source esp (todo: change to meters? something more intuitive? should that mapping happen here or parameterized when creating the fn?)
+                50 * (2 * pi() * 6378137) / (256 * power(2, z)),
+                -- (0.1 * (2 * pi() * 6378137) / power(3, z*2)), -- Adjust `1000` as needed
+                -- 1/z,  -- @distance: Hardcoded cluster distance in source esp (todo: change to meters? something more intuitive? should that mapping happen here or parameterized when creating the fn?)
                 1    -- Minimum points per cluster
             ) OVER () AS cluster_id
             -- COUNT(*) AS point_count -- Number of points in the cluster (maybe?)
