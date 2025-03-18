@@ -6,7 +6,11 @@ PYTHON="$ROOT/jamie_bin/.venv/bin/python"
 
 source "$ROOT/jamie_bin/api-key.sh"
 
+set +e
 $PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-org
+set -e
 $PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-package
-$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-spatial-resource Point
-$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-non-spatial-resource
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-spatial-resource Point "50k" --rows 50000
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-spatial-resource Point "10k" --rows 10000
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-spatial-resource Point "1k" --rows 1000
+$PYTHON "$ROOT/jamie_bin/spatial_dev_utils.py" create-non-spatial-resource "csv (1k)"
