@@ -91,6 +91,7 @@ services:
       - db
     environment:
       DATABASE_URL: "postgres://${DATASTORE_READONLY_USER}:${DATASTORE_READONLY_PASSWORD}@db:5432/${DATASTORE_DB}"
+      TS_DBTIMEOUT: 300 # remove eventually, for testing... 
     ports:
       # For debugging, remove eventually
       - "7800:7800"
