@@ -1,38 +1,3 @@
--- -- Hard-coded things (not ideal): id (column), distance (int, meters?), table_name
--- CREATE OR REPLACE FUNCTION xyz_cluster(
---     z INTEGER,
---     x INTEGER,
---     y INTEGER
--- ) RETURNS BYTEA 
--- LANGUAGE SQL 
--- AS $$
--- WITH tile_bounds AS (
---     SELECT ST_TileEnvelope(z, x, y) AS geom
--- ),
--- clustered_points AS (
---     SELECT 
---         -- "geometry", "when", "value",
---         ST_ClusterDBSCAN(
---             "geometry", -- @id. Array of points ordered by id
---             0.011,  -- @distance: Hardcoded cluster distance in source esp (todo: change to meters? something more intuitive? should that mapping happen here or parameterized when creating the fn?)
---             1    -- Minimum points per cluster
---         ) OVER () AS cluster_id,
---         COUNT(*) AS point_count -- Number of points in the cluster (maybe?)
---     FROM public."d4628c3f-4b5a-445d-827e-ff7d4f447114", tile_bounds -- @table_name
---     WHERE ST_Intersects("geometry", tile_bounds.geom) -- Only include points in the tile
--- ),
--- mvt_data AS (
---     -- Convert clustered points into MVT format
---     SELECT 
---         cluster_id, 
---         -- point_count, 
---         ST_AsMVTGeom(geom, (SELECT geom FROM tile_bounds), 4096, 64, true) AS geom
---     FROM clustered_points
--- )
--- SELECT ST_AsMVT(mvt_data, 'clusters')
--- FROM mvt_data;
--- $$;
-
 CREATE OR REPLACE FUNCTION xyz_cluster(
     z INTEGER,
     x INTEGER,
@@ -41,7 +6,7 @@ CREATE OR REPLACE FUNCTION xyz_cluster(
 LANGUAGE SQL 
 AS $$
 WITH
-    tile_bounds AS (SELECT ST_Transform(ST_TileEnvelope(0, 0, 0),4326) AS geom),
+    tile_bounds AS (SELECT ST_Transform(ST_TileEnvelope(z, x, y),4326) AS geom),
     groups AS (
         SELECT 
         -- "geometry", "when", "value",
@@ -62,8 +27,22 @@ WITH
         SELECT
         cluster_id,
         count(cluster_id),
-        ST_AsMVTGeom(ST_Transform(ST_Centroid(ST_Collect("geometry")),4326)) as center
+        -- ST_Transform(ST_Centroid(ST_Collect("geometry")), 4326) as center
+        -- ST_AsMVTGeom(ST_Centroid(ST_Collect("geometry")), ST_Transform(ST_TileEnvelope(0, 0, 0),4326)) as center
+        ST_AsMVTGeom(ST_Transform(ST_Centroid(ST_Collect("geometry")), 3857), ST_TileEnvelope(z, x, y)) as center
         from groups group by cluster_id
     )
-SELECT ST_AsMVT(mvt_data, 'clusters') FROM mvt_data;
+SELECT ST_AsMVT(mvt_data, 'default') FROM mvt_data;
+$$;
+
+CREATE OR REPLACE FUNCTION dummy(
+    z INTEGER,
+    x INTEGER,
+    y INTEGER
+) RETURNS BYTEA 
+LANGUAGE SQL 
+AS $$
+WITH
+    mvt_data AS (SELECT ST_AsMVTGeom(ST_Transform(ST_Point(-79,43,4326),3857), ST_TileEnvelope(z, x, y)) AS geom)
+SELECT ST_AsMVT(mvt_data, 'default') from mvt_data
 $$;
