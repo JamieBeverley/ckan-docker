@@ -38,6 +38,7 @@ WITH
         from groups group by cluster_id
     )
 SELECT *, ST_AsText(center) as "text" FROM mvt_data;
+STABLE;
 $$;
 
 select xyz_cluster_show(0,0,0);
